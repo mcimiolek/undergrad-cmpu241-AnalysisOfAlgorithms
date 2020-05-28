@@ -1,0 +1,198 @@
+\documentclass[12pt]{article}
+\usepackage{fullpage}
+\usepackage{latexsym}
+\usepackage{color}
+\usepackage{listings}
+\usepackage{caption}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage{etoolbox}   % for booleans and much more
+\usepackage{verbatim} % for the comment environment
+\usepackage{enumitem}
+
+%\pagestyle{empty}
+
+% set up solutions environment
+\newbool{hidesolutions}
+\setbool{hidesolutions}{false}
+
+% new environment
+\newenvironment{solution}{}
+
+% set conditional behaviour of environment
+\ifbool{hidesolutions}{\AtBeginEnvironment{solution}{\comment}
+\AtEndEnvironment{solution}{\endcomment}}{\AtBeginEnvironment{solution}{\begin{quote}}
+\AtEndEnvironment{solution}{\end{quote}}}
+
+
+
+\lstnewenvironment{algorithm}[1][] %defines the algorithm listing environment
+{   
+    \lstset{ %this is the stype
+        mathescape=true,
+        frame=tB,
+        numbers=left, 
+        numberstyle=\normalsize,
+        basicstyle=\normalsize, 
+        keywordstyle=\color{black}\bfseries\em,
+        keywords={input, output, return, datatype, function, in, if, else, for, while, begin, end}
+        numbers=left,
+        xleftmargin=.04\textwidth,
+    }
+}{}
+
+\begin{document}
+
+\begin{center}
+{ \Large \bf CMPU-241 - Analysis of Algorithms (Fall 2018)}\\
+  {\bf Rui Meireles \\
+Homework \#3 -- \ifbool{hidesolutions}{Due October 9\textsuperscript{th}, 2018}{<Matthew Imiolek>}\\
+ }
+  \vspace{.15in}
+% NAME:\underline{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }\\
+
+\end{center}
+
+
+\begin{enumerate}
+
+\item Use the master method to give a $\Theta$ asymptotic bound for the following recurrences. Or, if the master method can't be applied, please justify why.
+
+\begin{enumerate}
+
+\item (6 points) $T(n) = 2T(n/8) + \sqrt[3]{n}$
+
+\begin{solution}
+$f(n) = \sqrt[3]{n}$ \\
+$a = 2$ \\
+$b = 8$ \\
+$n^{\log_{8}{(2)} = \sqrt[3]{n}$ \\
+$f(n) = n^{\log_{b}{(a)}$ leading to case 2 being true. Therefore $T(n) = \theta{n^{\log_{8}{(2)}} lg n}$
+\end{solution}
+
+\item (6 points) $T(n) = T(\dfrac{n}{2}) + n - \cos n$
+
+\begin{solution}
+$f(n) = n-\cos(n)$ \\
+$a = 1$ \\
+$b = 2$ \\
+$n^{\log_{2}{(1)} = 1$ \\
+$f(n) \geq n^{\log_{b}{(a)}$ leading to case 3. However, the regularity condition doesn't hold making this a situation where the master theorem doesn't hold. af(n/b) \leq cf(n) when c is .01 and n is 11. $1(11/2-\cos(11/2) = 4.791 \geq 0.1(11-\cos(11) = 1.002$
+\end{solution}
+
+\item (6 points) $T(n) = \log_{16}{(2)} T(\dfrac{3}{5}n) + 1$
+
+\begin{solution}
+$f(n) = 1$ \\
+$a = \log_{16}{(2)} = 1/4$ \\
+$b = 5/3$ \\
+$n^{\log_{5/3}{(1/4)}$ \\
+As $ n^{\log_{b}{(a)}$ is a negative exponent the master theorem doesn't work.
+\end{solution}
+
+
+\item (6 points) $T(n) = 82T(\dfrac{n}{9}) + n^2 + n\lg{n}$
+
+\begin{solution}
+$f(n) = n^2 + n\lg{n}}$ \\
+$a = 82$ \\
+$b = 9$ \\
+$n^{\log_{9}{(82)} = n^(2.0056)$ \\
+$f(n) \leq n^{\log_{b}{(a)}$ leading to case 1 being true. Therefore $T(n) = \theta{n^{\log_{9}{(82)}}}$
+\end{solution}
+
+
+\item (6 points) $T(n) = T(\dfrac{n}{2}) - n^3 + n^2$
+
+\begin{solution}
+The master theorem doesn't work because f(n) is how long a combination should take, and this cannot be negative in a program and work in the master theorem.
+\end{solution}
+
+
+\end{enumerate}
+
+
+\item (25 points) How many nodes of depth $d$ can a heap have? Provide a tight range and use mathematical induction to prove it. Hint: think about the influence of the tree's height on the number of nodes at a given depth.
+
+\begin{solution}
+A heap can have up to $2^d$ nodes at depth d and as few as 1 node. \\
+
+Worst Case: \\
+
+Guess Bound by Substitution: \\
+T(0) = 1\\
+T(1) = T(0)*2 = 2*2 = 4\\
+T(2) = T(1)*2 = 4*2 = 8\\
+T(3) = T(2)*2 = 8*2 = 16\\
+T(d) = $2^d$\\
+Base Case: \\
+When the heap has a depth of 0. In this case the only node possible is the root, so there can only be 1 node. $2^0$ is 1, therefore $2^d$ works for the base case. \\
+Inductive Step: \\
+Assume that a tree of depth d has $2^d$ nodes. \\
+At depth d+1 each node at depth d gains 2 children in the worst case. Thus at depth d+1 there are $2*2^d$ nodes as we are doubling the number of nodes from the previous level which we know is $d^2$, which is the same as $2^{d+1}$ nodes, showing a heap can have $2^d$ nodes at any depth d.
+
+Best Case:\\
+
+Guess Bound by Substitution: \\
+T(0) = 1\\
+T(1) = T(0)\\
+T(2) = T(1)\\
+T(3) = T(2)\\
+T(d) = 1\\
+Base Case: \\
+When the heap has a depth of 0. In this case the only node possible is the root, so there can only be 1 node. 1 is 1, therefore 1 node works for the base case. \\
+Inductive Step: \\
+Assume that a tree of depth d has 1 nodes. \\
+At depth d+1 each node at depth d gains 1 child. Thus at depth d+1 there is 1 node as we are giving the single node at depth d a single child otherwise it does not actually reach depth d+1, showing a heap must have at least 1 node at any depth d.
+\end{solution}
+
+\item
+Recall the heapsort algorithm:
+
+\begin{tabular}{ p{1.4cm} p{13.3cm} }
+{\bf Input:} & an n-element array of numbers, A$[1\dots n]$; \\
+{\bf Output:}  & a permutation of A, $\{A_1^`,A_2^`,\dots,A_n^`\}$, such that $A_1^` \leq A_2^`\leq \dots A_n^`$.\\\\
+\end{tabular}
+
+\begin{algorithm}[]
+HeapSort(A)
+  Build-Max-Heap(A)
+  for i = A.length downto 2 do 
+    swap A[1] and A[i]
+    A.heap-size -= 1			
+    Max-Heapify(A,1)
+  \end{algorithm}
+
+Assume that the \texttt{Build-Max-Heap} and \texttt{Max-Heapify} procedures are correct and have the semantics specified in class. Let's now prove the correctness of heapsort.
+
+\begin{enumerate}
+
+\item (15 points) State the loop invariant for the loop of line 3.
+
+\begin{solution}
+Just before the start of iteration i, A has 2 sub-arrays. A[1...i] is a max head of the i smallest values in A, and A[i+1...A.length] contains the remaining values in A sorted smallest to largest.
+\end{solution}
+
+\item (30 points) Use the loop invariant you defined to prove heapsort's correctness.
+
+\begin{solution}
+Initialization: \\
+At the start of the first iteration Build-Max-Heap(A) has been called, and as we assume it works, A is a max heap containing all the values. As i = A.length for this first iteration, the sub-array A[1...i] is the same as the whole of A, which we know is a max heap of all the values, which therefore includes all the values. As there are no other values A[i+1...A.length] should be empty, which it is as no values have be designated as being there yet. \\
+
+Maintenance: \\
+Assume the invariant holds for iteration i. Thus, before iteration i+1, A[1..i] is a max heap of the i smallest values, and A[i+1...A.length] contains all the other values sorted smallest to largest. Swapping A[1] and A[i] puts the next largest value as the value before A[i+1...A.length], without messing up the order of values in that sub-array. By making the heap-size in A one less (basically decrementing i) the sub-array A[i+1...A.length] is now one larger, but due to switching A[1] and A[i] it still contains the A.length largest values ordered from least to greatest. A[1...i] still contains the i least values in A, and with the call to Max-Heapify they are once again a max heap. Therefore, the loop invariant is again the same for the next loop. \\
+
+Termination: \\
+When i = 1, A[1...i] has the lowest value in A, and A[i+1...A.length] has the remaining values from least the greatest. Therefore A has become completely least to greatest as a whole and the heap has been sorted.
+\end{solution}
+
+\end{enumerate}
+
+
+\end{enumerate}
+
+\end{document}
+
+
+

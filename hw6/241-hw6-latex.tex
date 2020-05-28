@@ -1,0 +1,167 @@
+\documentclass[12pt]{article}
+\usepackage{fullpage}
+\usepackage{latexsym}
+\usepackage{color}
+\usepackage{listings}
+\usepackage{caption}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{etoolbox}   % for booleans and much more
+\usepackage{verbatim} % for the comment environment
+\usepackage{enumitem}
+
+
+%\pagestyle{empty}
+
+% set up solutions environment
+\newbool{hidesolutions}
+\setbool{hidesolutions}{false}
+
+% new environment
+\newenvironment{solution}{}
+
+% set conditional behaviour of environment
+\ifbool{hidesolutions}{\AtBeginEnvironment{solution}{\comment}
+\AtEndEnvironment{solution}{\endcomment}}{\AtBeginEnvironment{solution}{\begin{quote}}
+\AtEndEnvironment{solution}{\end{quote}}}
+
+
+
+\lstnewenvironment{algorithm}[1][] %defines the algorithm listing environment
+{   
+    \lstset{ %this is the stype
+        mathescape=true,
+        frame=tB,
+        numbers=left, 
+        numberstyle=\normalsize,
+        basicstyle=\normalsize, 
+        keywordstyle=\color{black}\bfseries\em,
+        keywords={input, output, return, datatype, function, in, if, else, for, while, begin, end}
+        numbers=left,
+        xleftmargin=.04\textwidth,
+    }
+}{}
+
+\begin{document}
+
+\begin{center}
+{ \Large \bf CMPU-241 -- Analysis of Algorithms (Fall 2018)}\\
+  \vspace{.05in}
+{\large \bf Vassar College -- Computer Science Department}\\
+  \vspace{.05in}
+  {\bf Homework \#6 -- \ifbool{hidesolutions}{Due November 27\textsuperscript{th}, 2018}{Matthew Imiolek}\\
+ }
+  \vspace{.15in}
+% NAME:\underline{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }\\
+
+
+\end{center}
+
+\begin{enumerate}
+
+\item (15 points) Given an adjacency-list representation of a directed graph, how long does it take to compute the out-degree of every vertex? And how about the in-degree? Provide a tight asymptotic upper bound (Big-Oh bound) for both. Briefly justify your answers and list any relevant list implementation assumptions you make.
+
+\begin{solution}
+Given an adjacency-list representation, it would take $\theta{|V| + |E|}$ to compute the out-degree of every vertex. This is because for each vertex u in graph G, in its adjacency-list representation the out-degree of u is just Adj[u]. This also means that each edge is included once leading to the |E| portion, as it is the sum of time to search all of the edges in the full adjacency list representation, as each edge only can appear once. You also have to add the time to search all of the nodes, leading to the |V|. Basically, because you only have to go through the entire adjacency-list representation once, going through all the edges and nodes once, the time to compute the out-degree is $\theta{|V| + |E|}$. //
+//
+It would take $\theta{|V||E|}$ time to compute the in-degrees of every vertex. That is because to find if a vertex has an in-degree for another vertex you have to search the entire adjacency-list representation for that vertex, as we know a vertex u has an in-degree of another vertex v if it appears in vertex v's specific adjacency list Adj[v], but in order to find all these cases you have to go through all of the edges, leading to the |E| portion, for all of the vertexes, leading the the |V| part, and the multiplication part comes from the need to go through all of the edges for all of the vertexes. Basically, because you need to go through all the edges for all the nodes, going through the full adjacency-list multiple times, the time to compute the in-degrees is $\theta{|V||E|}$.\\
+\end{solution}
+
+
+\item Consider the Breadth-First Search (BFS) algorithm.
+
+\begin{enumerate}
+
+\item (15 points) Show the breadth-first tree that results from running BFS on the following graph, using vertex $s$ as a source and assuming the depicted adjacency-list representation. A content-associative array using letter indices is shown for ease of use.
+
+\begin{figure}[h!]
+\centering
+\end{figure}
+
+\begin{solution}
+See attached sheet.
+\end{solution}
+
+\item (15 points) Consider the following proposition: for a given graph $G=(V,E)$, BFS will always produce the same breadth-first tree. If you believe this to be true, provide an informal argument of that fact, otherwise provide a counter example.
+
+
+\begin{solution}
+This is false because depending on the order the nodes are searched in you can end up with a slightly different tree, although each tree will be correct. There is an attached sheet with an example based on part A.
+\end{solution}
+
+\end{enumerate}
+
+\item (20 points) In class we saw a recursive version of the Depth-First-Search (DFS) algorithm. Write an iterative version of this algorithm (pseudo-code). Hint: use a stack.
+
+\begin{solution}
+\begin{algorithm}
+Dfs(G)
+	foreach vertex u in G.V
+		u.color = WHITE
+		u.p = NIL
+	time = 0
+	foreach vertex u in G.V
+		if u.color == WHITE
+			DfsVisit(G,u)
+
+DfsVist(G,u)
+	stack = empty
+	stack.push(u)
+	while stack is not empty
+		x = stack.peek
+		if x.color == GREY
+			time = time + 1
+			x.f = time
+			x.color = BLACK
+			stack.pop
+		if u.color == WHITE
+			time = time + 1
+			x.d = time
+			x.color = GREY
+			foreach v in G.adj[x]
+				if v.color == WHITE
+				v.p = x
+				stack.push(x)
+		if x.color == BLACK
+			stack.pop
+\end{algorithm}
+\end{solution}
+
+\item A topological order of a graph $G=(V,E)$ is a total ordering of the vertex set $V$ such that if $(u,v)\in E$, then $u$ appears before $v$ in the ordering.
+
+\begin{enumerate}
+
+\item (20 points) Prove that if a graph $G=(V,E)$ has a topological order, then it is necessarily a DAG (Directed Acyclical Graph). Hint: use a proof by contradiction.
+
+\begin{solution}
+If a graph G = (V,E) has a topological order, then it is a DAG. \\
+- Proof by contradiction \\
+\\
+1) Assume that G is not acyclic \\
+2) By 1, there exists a cycle in G \\
+3) By 2, there exist edges $(p_{1},p_{2}),(p_{2},p_{3}),(p_{3},p_{4}), ... , (p_{n},p_{1})$ \\
+4) From the given fact G has a topological order, if $(u,v)\in E$, then u appears before v in the ordering \\
+5) Therefore $p_{1}$ must appear before $p_{2}$, which must appear before $p_{3}$, which must appear before $p_{4}$, and so on till we get to $p_{n}$, which must appear before $p_{1}$. \\
+    - This is a contradiction because $p_{1}$ would have to appear twice in the ordering, once in front of $p_{2}$ and once after $p_{2}$ as it follows $p_{n}$, which in turn follows $p_{2}$, if G were not acyclic. This means there is no position an edge in a cycle can go in an order and maintain that order as topological. \\
+
+Therefore the assumption G is not acyclic is false, and G must be acyclic.
+\end{solution}
+
+\item (15 points) 
+In class we saw how we could find a topological order for a graph by running DFS and, upon finishing each vertex, inserting it at the head of a list. Upon termination, the list would contain all the vertices in topological order. Could we accomplish the same thing by running DFS and, upon discovering a new vertex, inserting it at the tail of a list? If so, provide an informal argument to the validity of such a method. Otherwise, show it wouldn't work by providing a counter example.
+
+\begin{solution}
+This doesn't work. For example, if the DFSVisit() order is changed to "socks", "watch", "undershorts", "shirt" and we add a vertex to the tail of the list on its discovery we end up with the list: socks, shoes, watch, undershorts, pants, shoes, belt, jacket, shirt, tie. In this shoes ends up in-front of undershorts, which it should not in a topological order.
+\end{solution}
+
+\end{enumerate}
+
+
+\end{enumerate}
+
+\end{document}
+
+
+
+
+

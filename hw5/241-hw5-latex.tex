@@ -1,0 +1,251 @@
+\documentclass[12pt]{article}
+\usepackage{fullpage}
+\usepackage{latexsym}
+\usepackage{color}
+\usepackage{listings}
+\usepackage{caption}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{etoolbox}   % for booleans and much more
+\usepackage{verbatim} % for the comment environment
+\usepackage{enumitem}
+
+%\pagestyle{empty}
+
+% set up solutions environment
+\newbool{hidesolutions}
+\setbool{hidesolutions}{false}
+
+% new environment
+\newenvironment{solution}{}
+
+% set conditional behaviour of environment
+\ifbool{hidesolutions}{\AtBeginEnvironment{solution}{\comment}
+\AtEndEnvironment{solution}{\endcomment}}{\AtBeginEnvironment{solution}{\begin{quote}}
+\AtEndEnvironment{solution}{\end{quote}}}
+
+
+\lstnewenvironment{algorithm}[1][] %defines the algorithm listing environment
+{   
+    \lstset{ %this is the stype
+        mathescape=true,
+        frame=tB,
+        numbers=left, 
+        numberstyle=\footnotesize,
+        basicstyle=\footnotesize, 
+        keywordstyle=\color{black}\bfseries\em,
+        keywords={input, output, return, datatype, function, in, if, else, for, while, begin, end}
+        numbers=left,
+        xleftmargin=.04\textwidth,
+    }
+}{}
+
+\begin{document}
+
+\begin{center}
+{ \Large \bf CMPU-241 -- Analysis of Algorithms (Fall 2018)}\\
+  \vspace{.05in}
+{\large \bf Vassar College -- Computer Science Department}\\
+  \vspace{.05in}
+  {\bf Homework \#5 -- \ifbool{hidesolutions}{Due November 13\textsuperscript{th}, 2018}{Matthew Imiolek}\\
+ }
+  \vspace{.15in}
+% NAME:\underline{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }\\
+
+\end{center}
+
+\begin{enumerate}
+
+\item Recall the merge sort algorithm:
+
+\begin{tabular}{ p{1.4cm} p{13.3cm} }
+{\bf Input:} & An array of numbers $A[1\dots n]$ and indices $p$ and $r\in[1..n]$; \\
+{\bf Output:}  & A permutation of $A$ where the subarray $A_{p..r} = \{A_p^{'},A_{p+1}^{'},\dots,A_r^{'}\}$ is such that $A_p^{'} \leq A_{p+1}^{'}\leq \dots A_r^{'}$ and every other element of $A$ is unchanged.\\\\
+\end{tabular}
+\begin{algorithm}[]
+MergeSort(A, p, r)
+  if p < r
+    q = $\lfloor$(p+r-1)/2$\rfloor$
+    MergeSort(A, p, q)
+    MergeSort(A, q+1, r)
+    Merge(A, p, q, r)
+\end{algorithm}
+
+\begin{tabular}{ p{1.4cm} p{13.3cm} }
+{\bf Input:} &An array of numbers $A[1\dots n]$ and indices $p$, $q$ and $r\in[1..n]$, where $A[p..q]$ and $A[q+1..r]$ are sorted in non-decreasing order; \\
+{\bf Output:}  & A permutation of $A$ where the subarray $A_{p..r} = \{A_p^{'},A_{p+1}^{'},\dots,A_r^{'}\}$ is such that $A_p^{'} \leq A_{p+1}^{'}\leq \dots A_r^{'}$ and every other element of $A$ is unchanged. \\\\
+\end{tabular}
+\begin{algorithm}[]
+Merge(A, p, q, r)
+  n1 = q-p+1, n2 = r-q            // length of each half
+  let L[1...n1+1] and R[1...n2+1] be new arrays
+  for i = 1 to n1		  // copy left half to L 
+    L[i] = A[p+i-1]
+  for i = 1 to n2		  // copy right half to R
+    R[i] = A[q+i]
+  L[n1+1] = R[n2+1] = $\infty$            // place sentinel at end
+  i = j = 1                       // current indices for L and R
+  for k = p to r       
+    if L[i] $\leq$ R[j]		  // top of L pile <= top of R 
+      A[k] = L[i]
+      i = i+1			  // move L pile top
+    else A[k] = R[j]	
+      j = j+1                     // move R pile top
+\end{algorithm}
+
+\begin{enumerate}
+
+\item (6 points) Can merge sort be used as a subroutine of radix sort? I.e. is it a stable sorting algorithm? If so, argue why. If not, provide a counter example.
+
+\begin{solution}
+Merge sort can be used as a subroutine of radix sort as it is a stable sorting algorithm. The important part of the algorithm that makes it this way is the way merge is set up. Mergesort itself breaks up the original array into increasingly smaller arrays, which are then put back together using merge. In order to actually merge, merge takes two arrays, and looks at the first element of the first array, the array of elements originally left of the second array, and checks if its value is less than or equal to the first element in the second array, the originally right array, and in the case that is true, puts that element in the combined array, and otherwise puts the element in the second array in the combined array. As this is the only time elements can actually be moved around and have their order switched, and the arrays are combined with the array with the originally more left elements always being checked if its elements are less than or equal to those in the array with the originally more right elements, in any case the values are the same the originally most left of the equal elements will end up in the combined array first. This keeps the array stable as by inserting the equal elements left to right would keep them in the same left to right order they were in the original array.
+\end{solution}
+
+\item (6 points) If you answered negatively to the last question, provide a simple modification to merge sort (or its merge subroutine) that makes it become stable. Conversely, if you answered positively, provide a simple modification that makes merge sort become unstable.
+
+\begin{solution}
+A simple modification would be to check if the top of the “right” pile were >= the top of the “left” pile. This would insert the equal valued element most right in the original array as the most left of the equal element in the sorted array, reversing their order from the original array and making merge sort unstable.
+
+If R[i] >= L[i]
+	A[k] = R[i]
+	I = i+1
+else
+	A[k] = R[j]
+	J = j+1
+
+\end{solution}
+
+\end{enumerate}
+
+\item As we saw in class, inserting a sorted sequence of nodes into a regular, unbalanced, Binary-Search Tree yields a line tree. Red-Black Trees are designed to prevent the occurrence of such undesirable outcomes.
+
+\begin{enumerate}
+
+\item (10 points) Show the result of inserting nodes with values $\{1,2,3,4,5,6,7\}$ into an initially-empty Red-Black Tree. Show all intermediate steps.
+
+\begin{solution}
+See attached sheet
+\end{solution}
+
+\item (10 points) Show the result of deleting the nodes with values $\{1,2,3,4,5,6,7\}$ from the tree that resulted from (a). Show all intermediate steps. Note: we'll go through the delete procedure in the April 5\textsuperscript{th} lecture.
+
+\begin{solution}
+See attached sheet
+\end{solution}
+
+\end{enumerate}
+
+
+\item Property \#2 of Red-Black Trees states that the root node must be black.
+
+\begin{enumerate}
+
+\item (10 points) Argue that we cannot change property \#2 to state that the root must be red. Hint: show what would happen when trying to insert the values of question 1 into an initially-empty tree under this scenario.
+
+\begin{solution}
+We cannot make this change because it could become impossible to create a proper red-black tree that maintains the other rules. For example, in the case of adding more than one element to an originally empty red-black tree the first element would work, but the second would not. As nodes are entered red and then changed, requirement one would be met, as the root is by default red and the leaves are still black. The new requirement two would be met as the root was inserted as red. Requirement three would still be met as leaves are black and nil by default still. Requirement four would be met as the root would be red and the default leaves for the otherwise empty tree are still black. Requirement five would be met as there are only two black leaves at this time, each of which is a child of the root, and therefore causing the length from the root to the leaves to have the same number of black nodes; one. However, no matter what value the node added to this tree is, it will cause this tree to no longer work. As nodes are added as red, either side a new node to was added to in this tree would create a double red situation, as other than the red root, there is no where for a new node to be added. Since this is not valid, but the root has to stay red, the new node would have to become a black node. However, this would break requirement five, as one branch of the tree would have two black nodes between the root and a leaf, while the other side could only have one. Therefore you cannot change the rules so that the root has to be red.
+\end{solution}
+
+
+\item (10 points) Could we drop property \#2 entirely, and let the root be either black or red, depending on circumstance? Briefly justify your answer. If it is negative, identify the properties that would become impossible to meet under that scenario, and why. If it is positive, show how the {\sc RBT-Insert-Fixup(T, z)} procedure we saw in class would need to be changed if property \#2 is dropped.
+
+\begin{solution}
+Yes we could. The main purpose of a red black tree is to ensure that no path from root to leaf is more than twice as long as any other. The root is part of any path, there is no way to not have it in a path from root to leaf. As this is the case, as long as all the other rules are still in effect changing the color of root will not matter, as having a red root or a black root will have the same impact on the path length of all possible paths. If root is red, then its children will have to be black by the remaining rules, and there can still only be red every other node going down at most by rule four, although the root can now be one of those red cases, and this still restricts the max height of one branch when counting only the black nodes in a tree to double the height of the shortest branch. A combination of the other rules would cause the root to change color from red to black when necessary. The main issue with the root being only red was that it could force one path from the root to leaves to have more black nodes than the other, but as the root can now change back and forth when necessary, this is no longer an issue. All that has to be done is to make RBT-Insert-Fixup(T,z) work if property 2 is dropped is the removal of the last line, T.root.color = BLACK.
+\end{solution}
+
+\end{enumerate}
+
+\ifbool{hidesolutions}{\newpage}{}
+
+\item An AVL tree is another type of balanced binary search tree. AVL trees actually impose stricter balancing rules than Red-Black Trees. In an AVL tree, for each node $u$, the heights of the left and right subtrees of $u$ may differ by at most 1.
+
+\begin{enumerate}
+
+\item (15 points) Show that an AVL tree with $n$ nodes has height $O(\lg n)$. Hint: use the subtree height rule above to set up a recurrence for the number of nodes in an AVL tree of height $h$. Then solve the recurrence, for instance using backwards substitution (you may omit the proof by induction), to obtain the desired bound.
+
+\begin{solution}
+Recurrence: n(h) = n(h-1) + n(h-2) + 1, and n(0) = 0, and n(1) = 1 \\
+n(h) = n(h-1) + n(h-2) + 1 \\
+n(h-1) = n(h-2) + n(h-3) + 1 \\
+n(h) = (n(h-2) + n(h-3) + 1) +  n(h-2) + 1 \\
+= 2n(h-2) + n(h-3) + 2 \\
+\\
+n(h) > 2 n(h-2) \\
+\\
+n(2) = n(2-1) + n(2-2) + 1 = n(1) + n(0) + 1 = 1 + 0 + 1 = 2 \\
+n(3) = n(3-1) + n(3-2) + 1 = n(2) + n(1) + 1 = 2 + 1 + 1 = 4 \\
+n(4) = n(4-1) + n(4-2) + 1 = n(3) + n(2) + 1 = 4 + 2 + 1 = 7 \\
+\\
+n(h) > $2^(h/2)$ \\
+lg n(h) > lg($2^(h/2)$) \\
+h < lg(n) \\
+therefore an AVL tree with $n$ nodes has height $O(\lg n)$.
+\end{solution}
+
+\item Insertion in an AVL tree is initially performed just like in a regular, unbalanced, binary search tree, with the new node $z$ being inserted into its appropriate place in binary search tree order. Afterwards, the tree might no longer be height-balanced. Namely, for some node that is an ancestor of $z$, the heights of the left and right subtrees may now differ by 2.
+
+This imbalance can occur is 4 different ways. The following diagram depicts them and how balance can be restored through rotation:
+
+\begin{figure}[h]\hspace*{1.72cm}
+\centering
+\includegraphics[width=0.881\textwidth]{avl-cases.pdf}
+\end{figure}
+
+
+\begin{enumerate}
+
+\item (10 points) For each of the 4 cases above, list what rotations (left, right, and on which nodes) are performed to restore height balance.
+
+\begin{solution}
+For case 1 we first want to do a left rotate on node t, and then do a right rotate on node s. For case 2 we only want to do a right rotate on node s. For case 3 we first want to do a right rotate on node t, and then do a left rotate on node s. For case 4 we only want to do a left rotate on node s.
+\end{solution}
+
+
+\item (15 points) Write a procedure {\sc Balance(s)} that restores the AVL-tree height balance property for the subtree rooted at $s$, given that the height of $s$'s left and right subtrees differ by at most 2, and that the subtrees have a structure that fits into the cases in the figure above. In your answer assume that, in addition to the parent and child pointers of regular binary search trees, AVL nodes also have a field $h$ representing the height of the subtree rooted at the node. I.e. $s.left.h$ represents the height of the left subtree of $s$. You can also assume that, like in Red-Black Trees, all leaves are $T.nil$, and that $T.nil.h = 0$.
+
+Hint: remember to fix the height field of the nodes that have their heights changed by the procedure.
+
+\begin{solution}
+BALANCE(T,z) \\
+\tab while z != T.root \\
+\tab \tab if z.left.h > z.right.h + 1 \\
+\tab \tab \tab if z.left.left == T.nil \\
+\tab \tab \tab \tab Left-Rotate(T, z.left) \\
+\tab \tab \tab \tab Right-Rotate(T, z) \\
+\tab \tab \tab \tab z.h = z.h - 1 \\
+\tab \tab \tab \tab z.p.h = z.p.h + 1 \\
+\tab \tab \tab else \\
+\tab \tab \tab \tab Right-Rotate(t, z) \\
+\tab \tab \tab \tab z.h = z.h - 1 \\
+\tab \tab \tab \tab z.p.h = z.p.h + 1 \\
+\tab \tab \tab \tab z.p.left.h = z.p.left.h + 1 \\
+\tab \tab if z.right.h > z.left.h + 1 \\
+\tab \tab \tab if z.right.right == T.nil \\
+\tab \tab \tab \tab Right-Rotate(T, z.right) \\
+\tab \tab \tab \tab Left-Rotate(T, z) \\
+\tab \tab \tab \tab z.h = z.h - 1 \\
+\tab \tab \tab \tab z.p.h = z.p.h + 1 \\
+\tab \tab \tab else \\
+\tab \tab \tab \tab Left-Rotate(t, z) \\
+\tab \tab \tab \tab z.h = z.h - 1 \\
+\tab \tab \tab \tab z.p.h = z.p.h + 1 \\
+\tab \tab \tab \tab z.p.right.h = z.p.right.h + 1 \\
+\tab \tab z = z.p.p \\
+\end{solution}
+
+\item (8 points) What are the best-, average-, and worst-case asymptotic Big-Oh running times of the {\sc Balance(u)} procedure you defined in the previous question? No proof required, just a brief informal justification.
+
+\begin{solution}
+The worst case asymptotic Big-Oh run times are $O(\lg n)$. Rotating and updating take constant time, and therefore have minimal impact on run time. However, the recursive nature where balance goes through the entire tree, means that the run time will be based on the height of the tree, $O(h)$. We know from earlier the that h = lg n, therefore we end up with a run time of $O(\lg n)$. For these same reasons the average and best run time cases are the same, in both of these cases BALANCE still goes through the whole tree to see if anything is wrong, even if the inbalance isn't in the root. In these cases rotating and updating still take constant time, so height remains the only factor affecting run time, leading to the $O(\lg n)$ run time remaining.
+\end{solution}
+
+\end{enumerate}
+
+\end{enumerate}
+
+\end{enumerate}
+
+\end{document}
+
+
+

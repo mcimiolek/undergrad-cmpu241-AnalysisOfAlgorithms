@@ -1,0 +1,198 @@
+\documentclass[12pt]{article}
+\usepackage{fullpage}
+\usepackage{latexsym}
+\usepackage{color}
+\usepackage{listings}
+\usepackage{caption}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage{etoolbox}   % for booleans and much more
+\usepackage{verbatim} % for the comment environment
+
+%\pagestyle{empty}
+
+% set up solutions environment
+\newbool{hidesolutions}
+\setbool{hidesolutions}{false}
+
+% new environment
+\newenvironment{solution}{}
+
+% set conditional behaviour of environment
+\ifbool{hidesolutions}{\AtBeginEnvironment{solution}{\comment}
+\AtEndEnvironment{solution}{\endcomment}}{\AtBeginEnvironment{solution}{\begin{quote}}
+\AtEndEnvironment{solution}{\end{quote}}}
+
+
+
+\lstnewenvironment{algorithm}[1][] %defines the algorithm listing environment
+{   
+    \lstset{ %this is the stype
+        mathescape=true,
+        frame=tB,
+        numbers=left, 
+        numberstyle=\normalsize,
+        basicstyle=\normalsize, 
+        keywordstyle=\color{black}\bfseries\em,
+        keywords={input, output, return, datatype, function, in, if, else, for, while, begin, end}
+        numbers=left,
+        xleftmargin=.04\textwidth,
+    }
+}{}
+
+\begin{document}
+
+\begin{center}
+{ \Large \bf CMPU-241 - Analysis of Algorithms (Fall 2018)}\\
+  {\bf Rui Meireles \\
+Homework \#2 -- \ifbool{hidesolutions}{Due September 27\textsuperscript{rd}, 2018}{<Matthew Imiolek>}\\
+ }
+  \vspace{.15in}
+% NAME:\underline{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }\\
+
+\end{center}
+
+
+\begin{enumerate}
+
+
+\item (25 points) Order the following functions from lowest to highest asymptotic growth rate by providing a Big-theta asymptotic bound for each function. 
+
+If multiple functions belong to the same asymptotic class, group them together. You do not need to prove the bounds.
+
+\noindent
+For example, if given functions $\{n^{\lg{2}}; \ n^3; \ n^{\lg 4}; \ n^{\lg8}; \ n^2\}$, you should write the following:\\ 
+
+\hspace{1in}
+$n^{\lg{2}} \in \Theta(n),\{n^2, n^{\lg{4}}\} \in \Theta(n^2),\ \{n^3, n^{\lg{8}}\} \in \Theta(n^3)$ \\
+
+\noindent Order the following functions:\\
+$n^2$;\enspace $n^{2.1}$; \enspace
+$4^{\lg{n}}$; \enspace $e^n$;\enspace $\pi^n$;\enspace  $100$;\enspace  $0.9$;\enspace  $3n^2-99999n+1$;\enspace  $\ln{n^4}$;\enspace $\log_7{n}$;\enspace  $n\lg{n}$;\enspace  $n!$;\enspace  $3^{log_9{n}}$;\enspace  $\lg^2{n}$\\
+
+\begin{solution}
+
+$\{0.9, 100\} \in \Theta(1),\log_7{n} \in \Theta(\log_7{n}),\ln{n^4}{n} \in \Theta(\ln{n}), \lg^2{n} \in \Theta(\lg^2{n}),\{3^{\log_9{n}} \in \Theta(n^{1/2}),\ n\lg{n} \in \Theta(n\lg{n}),\{n^2, 4^{\lg{n}}, 3n^2-99999n+1\} \in \Theta(n^2), \ n^{2.1} \in \Theta(n^{2.1}), \ e^n, \in \Theta(e^n), \ \pi^n \in \Theta(\pi^n), \ n! \in \Theta(n!)$ \\
+
+\end{solution}
+
+\item 
+
+Binary search is an efficient algorithm for finding a value in a pre-sorted array:
+
+\begin{tabular}{ p{1.4cm} p{13.3cm} }
+
+{\bf Input:} & a non-empty, sorted in non-decreasing order, n-element array of numbers, A$[1\dots n]$; val, the value to be searched; low, the lowest index to be searched (initially set to 1) and; high, the highest index to be searched (initially set to n). \\
+{\bf Output:}  & the index of A where val can be found or -1 if val not present in A.\\\\
+
+\end{tabular}
+
+\begin{algorithm}[]
+  BinarySearch(A, val, low, high): 
+  
+    mid = $\lfloor$(low + high) / 2$\rfloor$
+
+    if A[mid] $==$ val
+      return mid
+    else if low $==$ high
+      return -1
+    else if A[mid] > val
+      return BinarySearch(A, val, low, mid)
+    else A[mid] < val
+      return BinarySearch(A, val, mid+1, high)
+  \end{algorithm}
+
+\begin{enumerate}
+
+\item (10 points) Briefly describe, in your own words, the algorithm's principle of operation. Mention what type of algorithm it is.
+
+\begin{solution}
+This program looks through a list sorted from least to greatest by checking if the middle value of the list is equal to the value being searched for. If it is not, it is then checked if that middle value is greater than or less than the value being searched for. If it is greater than the value then that middle point becomes the highest value possible in a new call of binary search, cutting the list being searched in half and changing the mid point. If it is less than the value of the middle point this same process happens, however the value one above middle point instead becomes the lowest value of the new list binary search looks through. This will continuously cut the list in half, if no value equal value is found, till one value is left, and if that value does not match the value being searched for then binary search will stop being called, and return a value of -1 indicating the value was not in the list. This is a divide and conquer style of problem as the program is gradually broken into smaller and smaller parts to solve.
+\end{solution}
+
+\item (10 points) Are the best-case and worst-case asymptotic running times the same? Briefly justify (no proofs required). You can use examples to justify your answer. 
+
+\begin{solution}
+No because the best case would be constant situation as the program would instantly find the answer and be able to quit out, but the worst case is a logarithmic situation as the program would have to continue, but each time the the list being searched would be half the size as before.
+\end{solution}
+
+\item (5 points) Define the algorithm's recurrence equation.
+
+\begin{solution}
+T(n) = \begin{cases}
+\Theta(1), \text{if } n \leq 1 \\
+T(n/2) + \Theta(1), \text{else}
+\end{cases}
+\end{solution}
+
+\item Prove a worst-case asymptotically-tight upper bound (i.e. Big-Oh bound) for the recurrence equation that you defined in (c), using:
+
+\begin{enumerate}
+\item (20 points) The substitution method. Note: pick your favorite bound guessing method.
+
+\begin{solution}
+T(1) = 1 \\
+T(2) = T(1) + 1 = 1 + 1 = 2 \\
+T(4) = T(2) + 1 = 2 + 1 = 3 \\
+T(8) = T(4) + 1 = 3 + 1 = 4 \\
+... \\
+= lg n \\
+
+Prove T(n) \in \textnormal{O(lg n) using mathematical induction} \\
+\textnormal{Recall f(n)} \in  \textnormal{O(g(n)) iff f(n)} \leq \textnormal{cg(n), for some c} > \textnormal{0 and all n} > n_O \\
+
+Base Case: \\
+n=1: 1 \leq c*\lg{1} \equiv 1 \leq c*0 \textnormal{ - always false} \\
+n=2: 1 + 1 \leq c*\lg{2} \equiv 2 \leq c*1 \textnormal{ - true for c} \geq 2\\
+
+Inductive Case:
+\textnormal{Assume T(n) } \leq \textnormal{ cn lg n holds for all m} < \textnormal{ n, in particular for m = n/2}
+T(n/2) \leq c lg(n/2)
+T(n) = T(n/2) + 1
+T(n) \leq c lg(n/2) + 1
+T(n) \leq 2 lg(n/2) + 1
+\end{solution}
+
+\item (12 points) The recursion tree method. Note: you don't need to repeat the proof by induction, just refer to the one you wrote in the previous question.
+
+\begin{solution}
+\\
+\\
+\\
+\\
+\\
+\\
+\\
+\\
+\\
+\\
+\\
+\\
+\\
+\\
+
+see previous proof by induction.
+\end{solution}
+
+\item (8 points) The master method. If it doesn't apply, explain why.
+
+\begin{solution}
+The master method doesn't apply because
+\end{solution}
+
+\end{enumerate}
+
+\item (10 points) Consider you have a very large unsorted array and one value to search for. In terms of running time, does it make sense to sort the array using merge sort and then perform a binary search versus doing a linear search on the unsorted array? Briefly justify your answer.
+
+\begin{solution}
+It makes sense to use merge sort and then perform a binary search because while the potential to quickly find the answer in a linear search is there, if it is at the end of an the array by default it could take a very long time to find it. On the other hand by using merge sort and then performing a binary search while we know that will take a set amount of time most likely greater than if the answer were the first value and we just looked linearly, on average using this method will find if the value is in the list faster.
+\end{solution}
+
+
+\end{enumerate}
+\end{enumerate}
+\end{document}
+
+
+
